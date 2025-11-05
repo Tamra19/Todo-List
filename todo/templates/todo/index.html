@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Todo List</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <nav>
+        <p>Welcome, {{ request.user.username }}! 
+        <a href="{% url 'logout' %}">Logout</a></p>
+    </nav>
+    <h1>Todo List</h1>
+
+    <!-- Form -->
+    <form action="{% url 'create_todo' %}" method="POST">
+        {% csrf_token %}
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" placeholder="Title" required>
+
+        <label for="description">Description:</label>
+        <input type="text" id="description" name="description" placeholder="Description" required>
+
+        <input type="submit" value="Add Todo">
+    </form>
+
+    <!-- Table -->
+     <br>
+     <br>
+    <table border="1" cellpadding="5">
+        <thead>
+            <tr>
+                <th>S No.</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Buttons</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for todo in todos %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ todo.title }}</td>
+                <td>{{ todo.description }}</td>
+                <td>
+                    {% if todo.progress %}
+                        ✅ Completed
+                    {% else %}
+                        ❌ Incomplete
+                    {% endif %}
+                </td>
+                <td>
+                    <form action="{% url 'complete_todo' todo.id %}" method="POST" style="display:inline;">
+                        {% csrf_token %}
+                        {% if todo.progress %}
+                            <button type="submit">Mark Incomplete</button>
+                        {% else %}
+                            <button type="submit">Mark Completed</button>
+                        {% endif %}
+                        <button type="submit">
+                        <a href="{% url 'delete_todo' todo.id %}">Delete</a>
+                        </button>
+                    </form>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4">No todos yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
